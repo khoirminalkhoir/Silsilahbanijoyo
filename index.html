@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Keluarga Besar Alm. Mbah Joyo &amp; Almh. Mbok Ginem</title>
+<style>
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+    background:linear-gradient(135deg,#eef2ff 0%,#f8fafc 50%,#ecfdf5 100%);
+    min-height:100vh;color:#1e293b;
+  }
+  header{text-align:center;padding:32px 20px 6px;}
+  h1{
+    margin:0 0 8px;font-size:clamp(20px,4vw,32px);
+    background:linear-gradient(90deg,#1e3a8a,#0ea5e9);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    font-weight:800;letter-spacing:-.5px;
+  }
+  .subtitle{color:#64748b;font-size:14px;margin:0 0 4px;}
+
+  .toolbar{
+    display:flex;gap:10px;justify-content:center;flex-wrap:wrap;
+    margin:22px 16px 10px;
+  }
+  .tool-btn{
+    border:1px solid #cbd5e1;background:#fff;color:#334155;
+    padding:9px 16px;border-radius:99px;font-size:13px;font-weight:600;
+    cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:6px;
+  }
+  .tool-btn:hover{background:#f1f5f9;border-color:#94a3b8;transform:translateY(-1px);}
+  .tool-btn:focus-visible{outline:2px solid #3b82f6;outline-offset:2px;}
+  .tool-btn.locked{background:#fef2f2;border-color:#fca5a5;color:#b91c1c;}
+  .tool-btn.unlocked{background:#f0fdf4;border-color:#86efac;color:#15803d;}
+
+  .tree-wrap{overflow-x:auto;padding:10px 20px 70px;text-align:center;}
+  .tree{display:inline-block;min-width:100%;}
+  .tree ul{
+    position:relative;display:flex;justify-content:center;
+    padding:22px 0 0;margin:0;
+  }
+  .tree li{
+    list-style:none;position:relative;text-align:center;
+    padding:22px 10px 0;
+  }
+  .tree li::before,
+  .tree li::after{
+    content:'';position:absolute;top:0;right:50%;
+    border-top:2px solid #cbd5e1;width:50%;height:22px;
+  }
+  .tree li::after{right:auto;left:50%;border-left:2px solid #cbd5e1;}
+  .tree li:only-child::after,
+  .tree li:only-child::before{display:none;}
+  .tree li:only-child{padding-top:0;}
+  .tree li:first-child::before,
+  .tree li:last-child::after{border:0 none;}
+  .tree li:last-child::before{border-right:2px solid #cbd5e1;border-radius:0 10px 0 0;}
+  .tree li:first-child::after{border-radius:10px 0 0 0;}
+  .tree ul ul::before{
+    content:'';position:absolute;top:0;left:50%;
+    border-left:2px solid #cbd5e1;width:0;height:22px;
+  }
+  .tree li.collapsed > ul{display:none;}
+
+  .card{
+    display:inline-flex;flex-direction:column;align-items:center;gap:5px;
+    background:#fff;border:1px solid #e2e8f0;border-radius:16px;
+    padding:14px 14px 12px;width:186px;
+    box-shadow:0 4px 14px rgba(15,23,42,.07);
+    transition:transform .22s,box-shadow .22s,border-color .22s;
+    position:relative;cursor:pointer;user-select:none;
+    font:inherit;
+  }
+  .card:hover{
+    transform:translateY(-4px);
+    box-shadow:0 12px 26px rgba(15,23,42,.14);
+    border-color:#93c5fd;
+  }
+  .card:focus-visible{outline:2px solid #3b82f6;outline-offset:3px;}
+  .avatar{
+    width:52px;height:52px;border-radius:50%;
+    display:grid;place-items:center;
+    font-weight:800;font-size:18px;color:#fff;letter-spacing:.5px;
+    background:linear-gradient(135deg,#6366f1,#3b82f6);
+    box-shadow:0 4px 10px rgba(59,130,246,.3);
+  }
+  .card .name{font-weight:700;font-size:14px;line-height:1.3;color:#0f172a;}
+  .card .spouse{font-size:12px;color:#475569;font-weight:600;}
+  .card .role{
+    font-size:10.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;
+    color:#475569;background:#f1f5f9;padding:2px 9px;border-radius:99px;
+  }
+  .child-count{
+    position:absolute;top:8px;right:10px;
+    font-size:10px;font-weight:800;color:#3b82f6;
+    background:#eff6ff;border:1px solid #bfdbfe;
+    padding:1px 7px;border-radius:99px;
+  }
+  .actions{display:flex;gap:6px;margin-top:6px;align-items:center;}
+  .btn-contact{
+    border:0;background:#eff6ff;color:#1d4ed8;
+    font-size:11.5px;font-weight:700;padding:6px 11px;border-radius:99px;
+    cursor:pointer;transition:.18s;display:inline-flex;align-items:center;gap:4px;
+    font-family:inherit;
+  }
+  .btn-contact:hover{background:#dbeafe;}
+  .btn-contact:focus-visible{outline:2px solid #3b82f6;outline-offset:2px;}
+  .btn-toggle{
+    border:1px solid #e2e8f0;background:#fff;color:#475569;
+    width:28px;height:28px;border-radius:50%;cursor:pointer;
+    font-size:12px;line-height:1;display:grid;place-items:center;
+    transition:.25s;
+  }
+  .btn-toggle:hover{background:#f1f5f9;border-color:#94a3b8;}
+  .btn-toggle:focus-visible{outline:2px solid #3b82f6;outline-offset:2px;}
+  .btn-toggle.collapsed{transform:rotate(-90deg);}
+
+  .gen-0 .avatar{background:linear-gradient(135deg,#7c3aed,#a855f7);box-shadow:0 4px 10px rgba(124,58,237,.3);}
+  .gen-1 .avatar{background:linear-gradient(135deg,#2563eb,#3b82f6);}
+  .gen-2 .avatar{background:linear-gradient(135deg,#0891b2,#06b6d4);}
+  .gen-3 .avatar{background:linear-gradient(135deg,#059669,#10b981);}
+  .gen-4 .avatar{background:linear-gradient(135deg,#d97706,#f59e0b);}
+  .gen-0{border-color:#ddd6fe;}
+  .gen-1{border-color:#dbeafe;}
+  .gen-2{border-color:#cffafe;}
+  .gen-3{border-color:#d1fae5;}
+  .gen-4{border-color:#fef3c7;}
+
+  .overlay{
+    position:fixed;inset:0;background:rgba(15,23,42,.55);
+    backdrop-filter:blur(4px);display:none;
+    align-items:center;justify-content:center;padding:20px;z-index:100;
+    animation:fadeIn .2s ease;
+  }
+  .overlay.show{display:flex;}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  @keyframes pop{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
+
+  .modal{
+    background:#fff;border-radius:20px;padding:26px 24px 22px;
+    width:100%;max-width:380px;position:relative;
+    box-shadow:0 24px 60px rgba(15,23,42,.3);
+    animation:pop .25s cubic-bezier(.2,.9,.3,1.2);
+    text-align:center;max-height:88vh;overflow-y:auto;
+  }
+  .modal-close{
+    position:absolute;top:12px;right:14px;border:0;background:#f1f5f9;
+    width:30px;height:30px;border-radius:50%;font-size:18px;color:#64748b;
+    cursor:pointer;line-height:1;transition:.18s;
+  }
+  .modal-close:hover{background:#e2e8f0;color:#0f172a;}
+  .modal-close:focus-visible{outline:2px solid #3b82f6;outline-offset:2px;}
+  .modal-avatar{
+    width:66px;height:66px;border-radius:50%;margin:4px auto 12px;
+    display:grid;place-items:center;font-weight:800;font-size:22px;color:#fff;
+    background:linear-gradient(135deg,#6366f1,#3b82f6);
+    box-shadow:0 6px 16px rgba(59,130,246,.35);
+  }
+  .modal-name{font-size:18px;font-weight:800;margin:0 0 4px;color:#0f172a;}
+  .modal-role{font-size:12px;color:#64748b;margin:0 0 4px;font-weight:600;}
+  .modal-spouse{font-size:13px;color:#475569;margin:0 0 16px;}
+
+  .contact-list{display:flex;flex-direction:column;gap:9px;margin-top:6px;}
+  .contact-item{
+    display:flex;align-items:center;gap:12px;
+    background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;
+    padding:11px 14px;text-decoration:none;color:#1e293b;
+    transition:.18s;text-align:left;
+  }
+  .contact-item:hover{background:#eff6ff;border-color:#93c5fd;transform:translateX(3px);}
+  .contact-item:focus-visible{outline:2px solid #3b82f6;outline-offset:2px;}
+  .ci-icon{font-size:18px;width:24px;text-align:center;flex-shrink:0;}
+  .ci-text{display:flex;flex-direction:column;min-width:0;}
+  .ci-label{font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;color:#64748b;font-weight:700;}
+  .ci-value{font-size:13.5px;font-weight:600;color:#1e293b;word-break:break-word;line-height:1.35;}
+  .no-contact{color:#94a3b8;font-size:13px;padding:18px 0;font-style:italic;}
+
+  .lock-icon{font-size:42px;margin-bottom:6px;}
+  .modal h3{margin:0 0 6px;font-size:18px;color:#0f172a;}
+  .modal p.hint{margin:0 0 18px;font-size:13px;color:#64748b;line-height:1.5;}
+  .pass-input{
+    width:100%;padding:13px 16px;border:2px solid #e2e8f0;border-radius:12px;
+    font-size:15px;outline:none;transition:.2s;text-align:center;
+    letter-spacing:2px;font-weight:600;
+  }
+  .pass-input:focus{border-color:#3b82f6;box-shadow:0 0 0 4px rgba(59,130,246,.12);}
+  .pass-input.error{border-color:#ef4444;animation:shake .35s;}
+  @keyframes shake{
+    0%,100%{transform:translateX(0)}
+    25%{transform:translateX(-7px)}
+    75%{transform:translateX(7px)}
+  }
+  .btn-primary{
+    width:100%;margin-top:14px;padding:13px;border:0;border-radius:12px;
+    background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;
+    font-size:14.5px;font-weight:700;cursor:pointer;transition:.2s;
+    box-shadow:0 6px 16px rgba(37,99,235,.3);font-family:inherit;
+  }
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 22px rgba(37,99,235,.4);}
+  .btn-primary:active{transform:translateY(0);}
+  .btn-primary:focus-visible{outline:2px solid #1d4ed8;outline-offset:2px;}
+  .err-msg{color:#ef4444;font-size:12.5px;margin-top:10px;font-weight:600;min-height:16px;}
+
+  .footer-note{
+    text-align:center;font-size:12px;color:#94a3b8;
+    padding:0 20px 40px;line-height:1.7;
+  }
+
+  .loading{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:70px 20px;color:#64748b;gap:14px;font-size:14px;
+  }
+  .spinner{
+    width:38px;height:38px;border-radius:50%;
+    border:3px solid #e2e8f0;border-top-color:#3b82f6;
+    animation:spin 1s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .load-error{
+    max-width:440px;margin:60px auto;padding:24px;
+    background:#fef2f2;border:1px solid #fecaca;border-radius:14px;
+    color:#991b1b;font-size:13.5px;line-height:1.6;text-align:left;
+  }
+  .load-error strong{display:block;margin-bottom:6px;font-size:15px;}
+  .load-error code{background:#fff;padding:1px 6px;border-radius:4px;font-size:12px;color:#b91c1c;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🌳 Keluarga Besar Alm. Mbah Joyo &amp; Almh. Mbok Ginem</h1>
+  <p class="subtitle">Klik pada kartu nama untuk menampilkan / menyembunyikan turunannya</p>
+</header>
+
+<div class="toolbar" role="toolbar" aria-label="Kontrol pohon silsilah">
+  <button class="tool-btn" id="expandAll">⬇️ Buka Semua</button>
+  <button class="tool-btn" id="collapseAll">⬆️ Tutup Semua</button>
+  <button class="tool-btn locked" id="lockBtn" aria-pressed="false">🔒 Kontak Terkunci</button>
+</div>
+
+<div class="tree-wrap" id="treeWrap">
+  <div id="loading" class="loading">
+    <div class="spinner"></div>
+    <div>Memuat data keluarga…</div>
+  </div>
+  <div class="tree" id="tree"></div>
+</div>
+
+<p class="footer-note">
+  Data kontak disembunyikan demi privasi.<br>
+  Masukkan password untuk membuka akses.<br>
+  <span style="color:#cbd5e1;">Data dimuat dari <code>data.json</code></span>
+</p>
+
+<!-- ===== MODAL KONTAK ===== -->
+<div class="overlay" id="contactModal" role="dialog" aria-modal="true" aria-labelledby="mName">
+  <div class="modal">
+    <button class="modal-close" data-close="contactModal" aria-label="Tutup">×</button>
+    <div class="modal-avatar" id="mAvatar">?</div>
+    <h3 class="modal-name" id="mName">Nama</h3>
+    <p class="modal-role" id="mRole">Peran</p>
+    <p class="modal-spouse" id="mSpouse"></p>
+    <div class="contact-list" id="mContacts"></div>
+  </div>
+</div>
+
+<!-- ===== MODAL PASSWORD ===== -->
+<div class="overlay" id="passModal" role="dialog" aria-modal="true" aria-labelledby="passTitle">
+  <div class="modal">
+    <button class="modal-close" data-close="passModal" aria-label="Tutup">×</button>
+    <div class="lock-icon" aria-hidden="true">🔐</div>
+    <h3 id="passTitle">Akses Terkunci</h3>
+    <p class="hint">Masukkan password untuk melihat<br>informasi kontak keluarga.</p>
+    <input type="password" class="pass-input" id="passInput"
+           placeholder="••••••••" autocomplete="off" aria-label="Password">
+    <button class="btn-primary" id="passSubmit">Buka Akses</button>
+    <div class="err-msg" id="errMsg" role="alert"></div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   1. PASSWORD — UBAH DI SINI
+   ========================================================= */
+const PASSWORD = "1";
+
+/* =========================================================
+   2. CONSTANTS
+   ========================================================= */
+const GEN_GRADIENTS = [
+  'linear-gradient(135deg,#7c3aed,#a855f7)',
+  'linear-gradient(135deg,#2563eb,#3b82f6)',
+  'linear-gradient(135deg,#0891b2,#06b6d4)',
+  'linear-gradient(135deg,#059669,#10b981)',
+  'linear-gradient(135deg,#d97706,#f59e0b)'
+];
+
+/* =========================================================
+   3. STATE
+   ========================================================= */
+let family = null;
+let unlocked = false;
+try { unlocked = sessionStorage.getItem('fam_unlocked') === '1'; } catch(e){}
+let pendingContact = null;
+let lastFocused = null;
+
+/* =========================================================
+   4. UTIL
+   ========================================================= */
+function getInitials(name){
+  const cleaned = name
+    .replace(/^(H\.|Hj\.|Drs\.|Ir\.|Prof\.|Alm\.|Almh\.)\s*/gi,'')
+    .trim();
+  const parts = cleaned.split(/\s+/).filter(Boolean);
+  if (!parts.length) return '?';
+  if (parts.length === 1) return parts[0].slice(0,2).toUpperCase();
+  return (parts[0][0] + parts[1][0]).toUpperCase();
+}
+
+function cleanContact(c){
+  const out = {};
+  if (!c) return out;
+  for (const k in c){
+    const v = typeof c[k] === 'string' ? c[k].trim() : c[k];
+    if (v && v !== '-' && v !== '') out[k] = v;
+  }
+  return out;
+}
+
+/* =========================================================
+   5. RENDER TREE
+   ========================================================= */
+function renderNode(person, depth){
+  const li = document.createElement('li');
+  const hasChildren = Array.isArray(person.children) && person.children.length > 0;
+
+  const card = document.createElement('button');
+  card.type = 'button';
+  card.className = 'card gen-' + Math.min(depth, 4);
+  if (hasChildren){
+    card.setAttribute('aria-expanded', 'true');
+  }
+  card.innerHTML = `
+    ${hasChildren ? `<span class="child-count" aria-hidden="true">${person.children.length}</span>` : ''}
+    <div class="avatar" aria-hidden="true">${getInitials(person.name)}</div>
+    <div class="name">${person.name}</div>
+    ${person.spouse ? `<div class="spouse">&amp; ${person.spouse}</div>` : ''}
+    ${person.role ? `<div class="role">${person.role}</div>` : ''}
+    <div class="actions">
+      <span class="btn-contact" role="button" tabindex="0"
+            aria-label="Lihat kontak ${person.name}">📇 Kontak</span>
+      ${hasChildren ? '<span class="btn-toggle" aria-hidden="true">▾</span>' : ''}
+    </div>
+  `;
+
+  card.addEventListener('click', (e) => {
+    if (e.target.closest('.btn-contact')) return;
+    if (!hasChildren) return;
+    setCollapsed(li, !li.classList.contains('collapsed'));
+  });
+
+  const contactBtn = card.querySelector('.btn-contact');
+  const handleContact = (e) => {
+    e.stopPropagation();
+    requestContact(person, depth);
+  };
+  contactBtn.addEventListener('click', handleContact);
+  contactBtn.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' '){
+      e.preventDefault();
+      handleContact(e);
+    }
+  });
+
+  li.appendChild(card);
+
+  if (hasChildren){
+    const ul = document.createElement('ul');
+    person.children.forEach(child => ul.appendChild(renderNode(child, depth + 1)));
+    li.appendChild(ul);
+  }
+
+  return li;
+}
+
+function setCollapsed(li, collapsed){
+  if (collapsed) li.classList.add('collapsed');
+  else li.classList.remove('collapsed');
+
+  const card = li.querySelector(':scope > .card');
+  if (!card) return;
+  const btn = card.querySelector('.btn-toggle');
+  if (btn) btn.classList.toggle('collapsed', collapsed);
+  if (card.hasAttribute('aria-expanded')){
+    card.setAttribute('aria-expanded', String(!collapsed));
+  }
+}
+
+/* =========================================================
+   6. LOAD & RENDER
+   ========================================================= */
+async function loadData(){
+  try {
+    const res = await fetch('./data.json', { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status + ' — ' + res.statusText);
+    const data = await res.json();
+    if (!data || !data.name) throw new Error('Struktur data.json tidak valid.');
+    return data;
+  } catch (err) {
+    showLoadError(err);
+    return null;
+  }
+}
+
+function showLoadError(err){
+  document.getElementById('loading').style.display = 'none';
+  const wrap = document.getElementById('treeWrap');
+  const div = document.createElement('div');
+  div.className = 'load-error';
+  div.innerHTML = `
+    <strong>⚠️ Gagal memuat <code>data.json</code></strong>
+    Penyebab: ${err.message}<br><br>
+    Pastikan:
+    <ul style="margin:8px 0 0 18px;padding:0;">
+      <li>File <code>data.json</code> ada di folder yang sama dengan <code>index.html</code></li>
+      <li>Halaman dibuka melalui server (GitHub Pages / localhost), bukan dari file://</li>
+      <li>Format JSON valid (tidak ada koma berlebih / tanda kutip hilang)</li>
+    </ul>
+  `;
+  wrap.innerHTML = '';
+  wrap.appendChild(div);
+}
+
+function renderTree(){
+  const treeRoot = document.getElementById('tree');
+  const rootUl = document.createElement('ul');
+  rootUl.appendChild(renderNode(family, 0));
+  treeRoot.appendChild(rootUl);
+
+  // collapse semua kecuali root
+  document.querySelectorAll('#tree li').forEach(li => {
+    if (li.querySelector(':scope > ul') && li !== rootUl.firstElementChild) {
+      setCollapsed(li, true);
+    }
+  });
+
+  // center horizontal scroll
+  const wrap = document.getElementById('treeWrap');
+  if (wrap && wrap.scrollWidth > wrap.clientWidth){
+    wrap.scrollLeft = (wrap.scrollWidth - wrap.clientWidth) / 2;
+  }
+}
+
+/* =========================================================
+   7. LOCK STATE
+   ========================================================= */
+const lockBtn = document.getElementById('lockBtn');
+
+function updateLockBtn(){
+  if (unlocked){
+    lockBtn.textContent = '🔓 Kontak Terbuka';
+    lockBtn.classList.remove('locked');
+    lockBtn.classList.add('unlocked');
+    lockBtn.title = 'Klik untuk mengunci kembali';
+    lockBtn.setAttribute('aria-pressed','true');
+  } else {
+    lockBtn.textContent = '🔒 Kontak Terkunci';
+    lockBtn.classList.add('locked');
+    lockBtn.classList.remove('unlocked');
+    lockBtn.title = 'Klik untuk membuka';
+    lockBtn.setAttribute('aria-pressed','false');
+  }
+}
+updateLockBtn();
+
+lockBtn.addEventListener('click', () => {
+  if (unlocked){
+    unlocked = false;
+    try { sessionStorage.removeItem('fam_unlocked'); } catch(e){}
+    updateLockBtn();
+  } else {
+    pendingContact = null;
+    openPassModal();
+  }
+});
+
+/* =========================================================
+   8. MODAL UTIL
+   ========================================================= */
+function showModal(id){
+  lastFocused = document.activeElement;
+  document.getElementById(id).classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function hideModal(id){
+  document.getElementById(id).classList.remove('show');
+  document.body.style.overflow = '';
+  if (lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
+}
+
+document.querySelectorAll('[data-close]').forEach(btn => {
+  btn.addEventListener('click', () => hideModal(btn.dataset.close));
+});
+document.querySelectorAll('.overlay').forEach(ov => {
+  ov.addEventListener('click', (e) => {
+    if (e.target === ov) ov.classList.remove('show');
+    if (e.target === ov) document.body.style.overflow = '';
+  });
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape'){
+    document.querySelectorAll('.overlay.show').forEach(o => {
+      o.classList.remove('show');
+      document.body.style.overflow = '';
+    });
+  }
+});
+
+/* =========================================================
+   9. KONTAK + PASSWORD FLOW
+   ========================================================= */
+function requestContact(person, depth){
+  if (unlocked){
+    showContact(person, depth);
+  } else {
+    pendingContact = { person, depth };
+    openPassModal();
+  }
+}
+
+function openPassModal(){
+  const input = document.getElementById('passInput');
+  input.value = '';
+  input.classList.remove('error');
+  document.getElementById('errMsg').textContent = '';
+  showModal('passModal');
+  setTimeout(() => input.focus(), 120);
+}
+
+document.getElementById('passSubmit').addEventListener('click', submitPassword);
+document.getElementById('passInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') submitPassword();
+});
+
+function submitPassword(){
+  const input = document.getElementById('passInput');
+  const err = document.getElementById('errMsg');
+  const val = input.value.trim();
+
+  if (val === PASSWORD){
+    unlocked = true;
+    try { sessionStorage.setItem('fam_unlocked','1'); } catch(e){}
+    updateLockBtn();
+    err.textContent = '';
+    hideModal('passModal');
+    if (pendingContact){
+      const { person, depth } = pendingContact;
+      pendingContact = null;
+      setTimeout(() => showContact(person, depth), 220);
+    }
+  } else {
+    input.classList.add('error');
+    err.textContent = '❌ Password salah. Coba lagi.';
+    setTimeout(() => input.classList.remove('error'), 400);
+    input.value = '';
+    input.focus();
+  }
+}
+
+/* =========================================================
+   10. SHOW CONTACT (termasuk maps)
+   ========================================================= */
+function showContact(person, depth){
+  const c = cleanContact(person.contact);
+  const mapsRaw = (person.maps || '').trim();
+
+  document.getElementById('mAvatar').textContent = getInitials(person.name);
+  document.getElementById('mAvatar').style.background = GEN_GRADIENTS[Math.min(depth,4)];
+  document.getElementById('mName').textContent = person.name;
+  document.getElementById('mRole').textContent = person.role || '';
+
+  const sp = document.getElementById('mSpouse');
+  sp.textContent = person.spouse ? '❤️ Pasangan: ' + person.spouse : '';
+
+  const list = document.getElementById('mContacts');
+  list.innerHTML = '';
+
+  const items = [];
+
+  if (c.phone) items.push({
+    icon:'📞', label:'Telepon', value:c.phone, href:'tel:' + c.phone, external:false
+  });
+
+  if (c.wa) items.push({
+    icon:'💬', label:'WhatsApp', value:'+' + c.wa,
+    href:'https://wa.me/' + c.wa + '?text=' + encodeURIComponent('Assalamualaikum ' + person.name + ' 👋'),
+    external:true
+  });
+
+  if (mapsRaw){
+    const isUrl = /^https?:\/\//i.test(mapsRaw);
+    const mapsHref = isUrl
+      ? mapsRaw
+      : 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(mapsRaw);
+    items.push({
+      icon:'📍',
+      label:'Alamat / Lokasi',
+      value: isUrl ? 'Buka di Google Maps' : mapsRaw,
+      href: mapsHref,
+      external:true
+    });
+  }
+
+  if (c.ig) items.push({
+    icon:'📸', label:'Instagram', value:'@' + c.ig,
+    href:'https://instagram.com/' + c.ig, external:true
+  });
+
+  if (c.fb) items.push({
+    icon:'👍', label:'Facebook', value:c.fb,
+    href:'https://facebook.com/' + c.fb, external:true
+  });
+
+  if (c.tiktok){
+    const isUrl = /^https?:\/\//i.test(c.tiktok);
+    const ttUser = c.tiktok.replace(/^@/, '');
+    items.push({
+      icon:'🎵', label:'TikTok',
+      value: isUrl ? c.tiktok : '@' + ttUser,
+      href: isUrl ? c.tiktok : 'https://www.tiktok.com/@' + ttUser,
+      external:true
+    });
+  }
+
+  if (c.email) items.push({
+    icon:'✉️', label:'Email', value:c.email, href:'mailto:' + c.email, external:false
+  });
+
+  if (items.length === 0){
+    list.innerHTML = '<div class="no-contact">Belum ada data kontak / lokasi untuk anggota ini.</div>';
+  } else {
+    items.forEach(it => {
+      const a = document.createElement('a');
+      a.className = 'contact-item';
+      a.href = it.href;
+      if (it.external){
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+      }
+      a.innerHTML = `
+        <span class="ci-icon" aria-hidden="true">${it.icon}</span>
+        <span class="ci-text">
+          <span class="ci-label">${it.label}</span>
+          <span class="ci-value">${it.value}</span>
+        </span>`;
+      list.appendChild(a);
+    });
+  }
+
+  showModal('contactModal');
+}
+
+/* =========================================================
+   11. EXPAND / COLLAPSE ALL
+   ========================================================= */
+document.getElementById('expandAll').addEventListener('click', () => {
+  document.querySelectorAll('#tree li').forEach(li => setCollapsed(li, false));
+});
+
+document.getElementById('collapseAll').addEventListener('click', () => {
+  const rootLi = document.querySelector('#tree > ul > li');
+  document.querySelectorAll('#tree li').forEach(li => {
+    if (li.querySelector(':scope > ul') && li !== rootLi) {
+      setCollapsed(li, true);
+    }
+  });
+});
+
+/* =========================================================
+   12. INIT
+   ========================================================= */
+(async function init(){
+  family = await loadData();
+  if (!family) return;
+  document.getElementById('loading').style.display = 'none';
+  renderTree();
+})();
+</script>
+</body>
+</html>
